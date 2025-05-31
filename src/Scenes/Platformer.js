@@ -70,6 +70,29 @@ class Platformer extends Phaser.Scene {
         this.killPartLayer.setTileIndexCallback([183, 182, 184], this.killPlayer, this);
         this.physics.add.overlap(my.sprite.player, this.killPartLayer);
 
+        my.vfx.walking = this.add.particles(0, 0, "kenny-particles", {
+            frame: ['smoke_01.png', 'smoke_07.png'],
+            random: true,
+            scale: {start: 0.001, end: 0.01},
+            maxAliveParticles: 12,
+            lifespan: 300,
+            gravityY: -40,
+            alpha: {start: 1, end: 0.5}, 
+        });
+        my.vfx.walking.stop();
+
+        my.vfx.jumping = this.add.particles(0, 0, "kenny-particles", {
+            frame: ['smoke_04.png', 'smoke_06.png'],
+            random: true,
+            scale: {start: 0.01, end: 0.025},
+            maxAliveParticles: 2,
+            lifespan: 300,
+            gravityY: -400,
+            alpha: {start: 1, end: 0.75}, 
+        });
+
+        my.vfx.jumping.stop();
+
     }
     killPlayer(plr, tile) {
         this.cameras.main.flash(100, 255, 0, 0);
@@ -89,6 +112,17 @@ class Platformer extends Phaser.Scene {
             my.sprite.player.setAccelerationX(-this.ACCELERATION);
             my.sprite.player.resetFlip();
             my.sprite.player.anims.play('walk', true);
+            my.vfx.walking.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-10, my.sprite.player.displayHeight/2-5, false);
+
+            my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
+
+            // Only play smoke effect if touching the ground
+
+            if (my.sprite.player.body.blocked.down) {
+
+                my.vfx.walking.start();
+
+            }
             if(!this.walkingNoise.isPlaying) {
                 // Only play the sound if it isn't already playing
                 this.walkingNoise.play();
@@ -100,6 +134,17 @@ class Platformer extends Phaser.Scene {
             my.sprite.player.setAccelerationX(this.ACCELERATION);
             my.sprite.player.setFlip(true, false);
             my.sprite.player.anims.play('walk', true);
+            my.vfx.walking.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-10, my.sprite.player.displayHeight/2-5, false);
+
+            my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
+
+            // Only play smoke effect if touching the ground
+
+            if (my.sprite.player.body.blocked.down) {
+
+                my.vfx.walking.start();
+
+            }
             if(!this.walkingNoise.isPlaying) {
                 // Only play the sound if it isn't already playing
                 this.walkingNoise.play();
@@ -113,6 +158,7 @@ class Platformer extends Phaser.Scene {
             my.sprite.player.setDragX(this.DRAG);
             my.sprite.player.anims.play('idle');
             this.walkingNoise.stop();
+            my.vfx.walking.stop();
             // TODO: have the vfx stop playing
         }
 
@@ -121,11 +167,15 @@ class Platformer extends Phaser.Scene {
         // Handle animation while airborne
 if (!my.sprite.player.body.blocked.down) {
     my.sprite.player.anims.play('jump');
+    my.vfx.jumping.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-10, my.sprite.player.displayHeight/2-5, false);
+    my.vfx.jumping.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
+    my.vfx.jumping.start();
 }
 
 // Reset jumps when on the ground
 if (my.sprite.player.body.blocked.down) {
     this.jumps = 0;
+    my.vfx.jumping.stop();
 }
 
 // Jump if under jump limit
