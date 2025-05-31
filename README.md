@@ -1,5 +1,5 @@
-**Platform Improvement**
+Tuna a platformer game that sure is hard, so to ensure that our ending is rigtht for purposes of grading push "r" to be teleported to the end and simply walk into the toarch to finish the game! 
 
-Starter code for creating a platformer game using Arcade Phsyics in Phaser.
+Enjoy!
 
 Visual assets courtesy of [Kenny Assets](https://kenney.nl/assets), with gratitude.
