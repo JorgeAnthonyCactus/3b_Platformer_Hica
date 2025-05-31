@@ -63,6 +63,29 @@ class Platformer extends Phaser.Scene {
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
             this.physics.world.debugGraphic.clear()
         }, this);
+
+        const endTriggers = this.map.createFromObjects("RealTriggers", {
+            // optional: name/type filters
+        });
+        
+        // Create an Arcade Physics Group
+        this.endTriggerGroup = this.physics.add.group();
+
+        // Add each object to the group
+        endTriggers.forEach(obj => {
+            this.endTriggerGroup.add(obj);          // add to group
+            obj.body.setAllowGravity(false);        // prevent falling
+            obj.body.setImmovable(true);            // so it doesn't move
+            obj.setVisible(false);                  // optional: hide trigger box
+        });
+
+        
+        // Overlap check
+        this.physics.add.overlap(my.sprite.player, this.endTriggerGroup, this.endGame, null, this);
+
+        console.log("End trigger objects:", endTriggers);
+
+        
         
         this.coinsLayer.setTileIndexCallback([1,2,3], this.addCoin, this);
         this.physics.add.overlap(my.sprite.player, this.coinsLayer);
@@ -104,6 +127,10 @@ class Platformer extends Phaser.Scene {
 
     addCoin(plr, tile) {
         this.coinsLayer.removeTileAt(tile.x, tile.y, true, true);
+    }
+
+    endGame(plr, tile) {
+        this.scene.switch ("endScene");
     }
     
 
@@ -192,7 +219,9 @@ if (Phaser.Input.Keyboard.JustDown(cursors.up) && this.jumps < this.maxJumps) {
 
 
         if(Phaser.Input.Keyboard.JustDown(this.rKey)) {
-            this.scene.restart();
+            my.sprite.player.x = 575
+            my.sprite.player.y = 250
+
         }
     }
 }
